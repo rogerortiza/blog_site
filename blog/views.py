@@ -4,9 +4,9 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.shortcuts import render, get_object_or_404
 from django.core.mail import send_mail
 from django.views.generic import ListView
+from taggit.models import Tag
 from .models import Post, Comment
 from .forms import EmailPostForm, CommentForm
-from taggit.models import Tag
 
 
 class PostListView(ListView):
@@ -75,13 +75,13 @@ def post_share(request, post_id):
     if request.method == 'POST':
         form = EmailPostForm(request.POST)
         if form.is_valid():
-            cd = form.cleaned_data
+            data = form.cleaned_data
             post_url = request.build_absolute_uri(post.get_absolute_url())
-            subject = f"{cd['name']} recommends you read {post.title}"
-            message = f"Read {post.title} at {post_url} \n\n {cd['name']}\s " \
-                      f"comments: {cd['comments']}"
+            subject = f"{data['name']} recommends you read {post.title}"
+            message = f"Read {post.title} at {post_url} \n\n" \
+                      f" {data['name']}\'s comments: {data['comments']}"
 
-            send_mail(subject, message, 'rogerortiz4@gmail.com', [cd['to']])
+            send_mail(subject, message, 'rogerortiz4@gmail.com', [data['to']])
             sent = True
     else:
         form = EmailPostForm()
